@@ -64,10 +64,14 @@ Everything is scoped by role, so an auditor only ever sees what's relevant to th
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────┐        REST + JWT        ┌──────────────────────┐        JPA/Hibernate        ┌──────────────┐
-│   React (Vite) SPA   │ ───────────────────────▶ │   Spring Boot API     │ ───────────────────────────▶ │   MySQL DB    │
-│  localhost:5173       │ ◀─────────────────────── │  localhost:8080/api   │ ◀───────────────────────────  │              │
-└─────────────────────┘         JSON               └──────────────────────┘                              └──────────────┘
+┌──────────────────────┐      ┌──────────────────────┐      ┌──────────────────────┐
+│   React (Vite) SPA   │      │   Spring Boot API    │      │    MySQL Database    │
+│    localhost:5173    │      │  localhost:8080/api  │      │                      │
+└──────────┬───────────┘      └──────────┬───────────┘      └──────────┬───────────┘
+           │                             │                             │
+           │  ──── REST + JSON ────▶     │  ──── JPA / Hibernate ───▶  │
+           │  ◀──── JWT + Data ─────     │  ◀───────── SQL ──────────  │
+           │                             │                             │
 ```
 
 - The frontend attaches the JWT to every request via an Axios interceptor.
@@ -144,22 +148,24 @@ cd <your-repo>
 cd AuditManagementSystem
 
 # create the database
-mysql -u root -p -e "CREATE DATABASE audit_management_system;"
+mysql -u root -p -e "CREATE DATABASE audit_management;"
 ```
 
-Configure `src/main/resources/application.properties`:
+The project ships with working local defaults in `src/main/resources/application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/audit_management_system
-spring.datasource.username=your_db_username
-spring.datasource.password=your_db_password
+spring.application.name=AuditManagementSystem
+
+spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/audit_management}
+spring.datasource.username=${DB_USERNAME:root}
+spring.datasource.password=${DB_PASSWORD:admin}
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
-
-jwt.secret=replace-with-a-long-random-secret-key
-jwt.expiration=3600000
+spring.jpa.properties.hibernate.format_sql=true
 ```
+
+If your MySQL username/password differ from the defaults (`root` / `admin`), either edit the file directly or override it with environment variables before running (see [Environment Variables](#-environment-variables)).
 
 Seed the required roles (needed before anyone can register):
 
@@ -195,13 +201,31 @@ Register an account from `/register` (this defaults to `AUDITOR`/`COMPLIANCE_OFF
 
 ## 🔑 Environment Variables
 
-| Variable | File | Description |
+The backend reads DB config from environment variables with sensible local defaults, so it runs out of the box — override only what you need.
+
+| Variable | Default | Description |
 |---|---|---|
-| `spring.datasource.url` | `application.properties` | JDBC URL of your MySQL database |
-| `spring.datasource.username` / `password` | `application.properties` | DB credentials |
-| `jwt.secret` | `application.properties` | Signing key for JWTs — keep this out of version control in production |
-| `jwt.expiration` | `application.properties` | Token lifetime in milliseconds (default: 1 hour) |
-| `baseURL` | `src/services/api.js` | Frontend's API base URL — update if the backend isn't on `localhost:8080` |
+| `DB_URL` | `jdbc:mysql://localhost:3306/audit_management` | JDBC URL of your MySQL database |
+| `DB_USERNAME` | `root` | MySQL username |
+| `DB_PASSWORD` | `admin` | MySQL password |
+
+> The frontend's API base URL is currently fixed to `http://localhost:8080/api` in `src/services/api.js`. If your backend runs elsewhere, update that line directly.
+
+To set one, e.g. on macOS/Linux:
+
+```bash
+export DB_PASSWORD=your_real_password
+./mvnw spring-boot:run
+```
+
+Or on Windows (PowerShell):
+
+```powershell
+$env:DB_PASSWORD="your_real_password"
+.\mvnw.cmd spring-boot:run
+```
+
+In an IDE, add these under your Run Configuration's **Environment Variables** field instead.
 
 ---
 
