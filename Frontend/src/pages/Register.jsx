@@ -213,6 +213,10 @@ function Register() {
                             disabled={loading}
                         >
 
+                            <option value="ADMIN">
+                                ADMIN
+                            </option>
+
                             <option value="AUDITOR">
                                 AUDITOR
                             </option>
