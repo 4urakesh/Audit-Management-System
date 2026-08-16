@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.AcquantHR.AuditManagementSystem.Entity.Audit;
 import com.AcquantHR.AuditManagementSystem.Entity.Finding;
 import com.AcquantHR.AuditManagementSystem.Entity.User;
+import com.AcquantHR.AuditManagementSystem.Exception.ResourceNotFoundException;
+import com.AcquantHR.AuditManagementSystem.Exception.UnauthorizedActionException;
 import com.AcquantHR.AuditManagementSystem.Repo.AuditRepository;
 import com.AcquantHR.AuditManagementSystem.Repo.FindingRepository;
 import com.AcquantHR.AuditManagementSystem.Repo.UserRepository;
@@ -43,13 +45,13 @@ public class FindingServiceImpl implements FindingService {
 
         User auditor = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new ResourceNotFoundException("User not found"));
 
         // Check role
         if (auditor.getRole() == null ||
                 !auditor.getRole().getName().equals("AUDITOR")) {
 
-            throw new RuntimeException(
+            throw new UnauthorizedActionException(
                     "Only AUDITOR can create finding");
         }
 
@@ -57,7 +59,7 @@ public class FindingServiceImpl implements FindingService {
         if (finding.getAudit() == null ||
                 finding.getAudit().getId() == null) {
 
-            throw new RuntimeException(
+            throw new ResourceNotFoundException(
                     "Audit ID is required");
         }
 
@@ -67,15 +69,15 @@ public class FindingServiceImpl implements FindingService {
         // Get actual audit from database
         Audit audit = auditRepository.findById(auditId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Audit not found"));
+                        new ResourceNotFoundException(
+                                "Audit not found with id: " + auditId));
 
         // Check auditor assignment
         if (audit.getAuditor() == null ||
                 !audit.getAuditor().getId()
                         .equals(auditor.getId())) {
 
-            throw new RuntimeException(
+            throw new UnauthorizedActionException(
                     "This audit is not assigned to you");
         }
 
@@ -90,8 +92,8 @@ public class FindingServiceImpl implements FindingService {
 
         return findingRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Finding not found"));
+                        new ResourceNotFoundException(
+                                "Finding not found with id: " + id));
     }
 
     @Override
@@ -134,8 +136,8 @@ public class FindingServiceImpl implements FindingService {
     public void deleteFinding(Long id) {
 
         if (!findingRepository.existsById(id)) {
-            throw new RuntimeException(
-                    "Finding not found");
+            throw new ResourceNotFoundException(
+                    "Finding not found with id: " + id);
         }
 
         findingRepository.deleteById(id);

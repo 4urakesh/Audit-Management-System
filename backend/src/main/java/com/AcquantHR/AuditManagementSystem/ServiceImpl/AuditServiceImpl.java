@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.AcquantHR.AuditManagementSystem.Entity.Audit;
 import com.AcquantHR.AuditManagementSystem.Entity.User;
+import com.AcquantHR.AuditManagementSystem.Exception.ResourceNotFoundException;
+import com.AcquantHR.AuditManagementSystem.Exception.UnauthorizedActionException;
 import com.AcquantHR.AuditManagementSystem.Repo.AuditRepository;
 import com.AcquantHR.AuditManagementSystem.Repo.UserRepository;
 import com.AcquantHR.AuditManagementSystem.Service.AuditService;
@@ -13,7 +15,7 @@ import com.AcquantHR.AuditManagementSystem.Service.AuditService;
 @Service
 public class AuditServiceImpl implements AuditService {
 
-    
+
     private final AuditRepository auditRepository;
     private final UserRepository userRepository;
 
@@ -33,7 +35,8 @@ public class AuditServiceImpl implements AuditService {
     @Override
     public Audit getAuditById(Long id) {
         return auditRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Audit not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Audit not found with id: " + id));
     }
 
     @Override
@@ -58,6 +61,11 @@ public class AuditServiceImpl implements AuditService {
 
     @Override
     public void deleteAudit(Long id) {
+
+        if (!auditRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Audit not found with id: " + id);
+        }
+
         auditRepository.deleteById(id);
     }
 
@@ -73,18 +81,18 @@ public class AuditServiceImpl implements AuditService {
 
         Audit audit = auditRepository.findById(auditId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Audit not found"));
+                        new ResourceNotFoundException(
+                                "Audit not found with id: " + auditId));
 
         User auditor = userRepository.findById(auditorId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Auditor not found"));
+                        new ResourceNotFoundException(
+                                "Auditor not found with id: " + auditorId));
 
-        if (!auditor.getRole().getName()
-                .equals("AUDITOR")) {
+        if (auditor.getRole() == null ||
+                !auditor.getRole().getName().equals("AUDITOR")) {
 
-            throw new RuntimeException(
+            throw new UnauthorizedActionException(
                     "Selected user is not an auditor");
         }
 
@@ -92,13 +100,14 @@ public class AuditServiceImpl implements AuditService {
 
         return auditRepository.save(audit);
     }
-    
+
     @Override
     public List<Audit> getAuditsByAuditor(Long auditorId) {
 
         User auditor = userRepository.findById(auditorId)
                 .orElseThrow(() ->
-                        new RuntimeException("Auditor not found"));
+                        new ResourceNotFoundException(
+                                "Auditor not found with id: " + auditorId));
 
         return auditRepository.findByAuditor(auditor);
     }

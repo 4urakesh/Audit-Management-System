@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.AcquantHR.AuditManagementSystem.Entity.Compliance;
+import com.AcquantHR.AuditManagementSystem.Exception.ResourceNotFoundException;
 import com.AcquantHR.AuditManagementSystem.Repo.ComplianceRepository;
 import com.AcquantHR.AuditManagementSystem.Service.ComplianceService;
 
@@ -25,7 +26,8 @@ public class ComplianceServiceImpl implements ComplianceService {
     @Override
     public Compliance getComplianceById(Long id) {
         return complianceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Compliance not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Compliance record not found with id: " + id));
     }
 
     @Override
@@ -48,6 +50,11 @@ public class ComplianceServiceImpl implements ComplianceService {
 
     @Override
     public void deleteCompliance(Long id) {
+
+        if (!complianceRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Compliance record not found with id: " + id);
+        }
+
         complianceRepository.deleteById(id);
     }
 
