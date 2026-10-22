@@ -17,6 +17,12 @@ public class Audit {
 
 	private String description;
 
+	private String scope;
+
+	private String objectives;
+
+	private String riskLevel;
+
 	private LocalDate startDate;
 
 	private LocalDate endDate;
@@ -64,6 +70,30 @@ public class Audit {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getScope() {
+		return scope;
+	}
+
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+
+	public String getObjectives() {
+		return objectives;
+	}
+
+	public void setObjectives(String objectives) {
+		this.objectives = objectives;
+	}
+
+	public String getRiskLevel() {
+		return riskLevel;
+	}
+
+	public void setRiskLevel(String riskLevel) {
+		this.riskLevel = riskLevel;
 	}
 
 	public LocalDate getStartDate() {

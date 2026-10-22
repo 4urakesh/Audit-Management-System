@@ -54,6 +54,9 @@ function Audits() {
     const emptyForm = {
         title: "",
         description: "",
+        scope: "",
+        objectives: "",
+        riskLevel: "MEDIUM",
         startDate: "",
         endDate: "",
         status: "PENDING",
@@ -199,6 +202,9 @@ function Audits() {
         setFormData({
             title: audit.title || "",
             description: audit.description || "",
+            scope: audit.scope || "",
+            objectives: audit.objectives || "",
+            riskLevel: audit.riskLevel || "MEDIUM",
             startDate: audit.startDate || "",
             endDate: audit.endDate || "",
             status: audit.status || "PENDING",
@@ -264,6 +270,9 @@ function Audits() {
             const payload = {
                 title: formData.title,
                 description: formData.description,
+                scope: formData.scope,
+                objectives: formData.objectives,
+                riskLevel: formData.riskLevel,
                 startDate: formData.startDate || null,
                 endDate: formData.endDate || null,
                 status: formData.status
@@ -467,6 +476,7 @@ function Audits() {
 
                                 <th>ID</th>
                                 <th>Title</th>
+                                <th>Risk</th>
                                 <th>Status</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
@@ -495,6 +505,12 @@ function Audits() {
 
                                         <td className="user-name-cell">
                                             {audit.title}
+                                        </td>
+
+                                        <td>
+                                            <span className={`risk-level risk-${(audit.riskLevel || "medium").toLowerCase()}`}>
+                                                {audit.riskLevel || "MEDIUM"}
+                                            </span>
                                         </td>
 
                                         <td>
@@ -673,6 +689,47 @@ function Audits() {
                                     disabled={saving}
                                 />
 
+                            </div>
+
+                            <div className="user-form-group">
+                                <label htmlFor="scope">Scope</label>
+                                <textarea
+                                    id="scope"
+                                    name="scope"
+                                    value={formData.scope}
+                                    onChange={handleChange}
+                                    placeholder="Systems, teams, locations, or processes covered"
+                                    rows="3"
+                                    disabled={saving}
+                                />
+                            </div>
+
+                            <div className="user-form-group">
+                                <label htmlFor="objectives">Objectives</label>
+                                <textarea
+                                    id="objectives"
+                                    name="objectives"
+                                    value={formData.objectives}
+                                    onChange={handleChange}
+                                    placeholder="What should this audit verify?"
+                                    rows="3"
+                                    disabled={saving}
+                                />
+                            </div>
+
+                            <div className="user-form-group">
+                                <label htmlFor="riskLevel">Inherent risk</label>
+                                <select
+                                    id="riskLevel"
+                                    name="riskLevel"
+                                    value={formData.riskLevel}
+                                    onChange={handleChange}
+                                    disabled={saving}
+                                >
+                                    {["LOW", "MEDIUM", "HIGH", "CRITICAL"].map((risk) => (
+                                        <option key={risk} value={risk}>{risk}</option>
+                                    ))}
+                                </select>
                             </div>
 
 

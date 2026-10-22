@@ -12,6 +12,7 @@ import Users from "./pages/Users";
 import Audits from "./pages/Audits";
 import Findings from "./pages/Findings";
 import Compliance from "./pages/Compliance";
+import Analytics from "./pages/Analytics";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Layout from "./components/Layout";
@@ -50,6 +51,11 @@ function App() {
                         <Route
                             path="/dashboard"
                             element={<Dashboard />}
+                        />
+
+                        <Route
+                            path="/analytics"
+                            element={<Analytics />}
                         />
 
                         <Route
