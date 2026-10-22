@@ -29,6 +29,13 @@ public class AuditServiceImpl implements AuditService {
 
     @Override
     public Audit createAudit(Audit audit) {
+        validateAudit(audit);
+        if (audit.getStatus() == null || audit.getStatus().isBlank()) {
+            audit.setStatus("PENDING");
+        }
+        if (audit.getRiskLevel() == null || audit.getRiskLevel().isBlank()) {
+            audit.setRiskLevel("MEDIUM");
+        }
         return auditRepository.save(audit);
     }
 
@@ -47,16 +54,36 @@ public class AuditServiceImpl implements AuditService {
     @Override
     public Audit updateAudit(Long id, Audit audit) {
 
+        validateAudit(audit);
         Audit existingAudit = getAuditById(id);
 
         existingAudit.setTitle(audit.getTitle());
         existingAudit.setDescription(audit.getDescription());
+        if (audit.getScope() != null) {
+            existingAudit.setScope(audit.getScope());
+        }
+        if (audit.getObjectives() != null) {
+            existingAudit.setObjectives(audit.getObjectives());
+        }
+        if (audit.getRiskLevel() != null && !audit.getRiskLevel().isBlank()) {
+            existingAudit.setRiskLevel(audit.getRiskLevel());
+        }
         existingAudit.setStartDate(audit.getStartDate());
         existingAudit.setEndDate(audit.getEndDate());
         existingAudit.setStatus(audit.getStatus());
         existingAudit.setAuditor(audit.getAuditor());
 
         return auditRepository.save(existingAudit);
+    }
+
+    private void validateAudit(Audit audit) {
+        if (audit == null || audit.getTitle() == null || audit.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Audit title is required");
+        }
+        if (audit.getStartDate() != null && audit.getEndDate() != null
+                && audit.getEndDate().isBefore(audit.getStartDate())) {
+            throw new IllegalArgumentException("Audit end date cannot be before its start date");
+        }
     }
 
     @Override

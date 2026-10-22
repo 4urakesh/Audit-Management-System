@@ -6,8 +6,8 @@
 
 A full-stack platform for planning audits, logging findings, and tracking compliance — built with **Spring Boot** and **React**.
 
-![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot&logoColor=white)
+![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.x-6DB33F?logo=springboot&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
@@ -50,6 +50,9 @@ Everything is scoped by role, so an auditor only ever sees what's relevant to th
 
 | | |
 |---|---|
+| **Audit Planning** | Capture audit scope, objectives, inherent risk, ownership, status, and planned dates |
+| **AI & Data Analytics** | Portfolio metrics, severity breakdowns, risk-ranked audits, and explainable local recommendations |
+| **Compliance Tracking** | Monitor requirements and compliance rates across audit engagements |
 | 🔐 **JWT Authentication** | Stateless login/register with BCrypt-hashed passwords |
 | 👥 **Role-Based Access** | `ADMIN`, `AUDITOR`, `COMPLIANCE_OFFICER` — enforced on both frontend routes and backend endpoints |
 | 📋 **Full CRUD everywhere** | Users, Audits, Findings, Compliance — create, edit, delete, all in polished modals |
@@ -99,7 +102,7 @@ Everything is scoped by role, so an auditor only ever sees what's relevant to th
 ## 📁 Project Structure
 
 ```
-AuditManagementSystem/                 # Spring Boot backend
+backend/                                # Spring Boot backend
 ├── src/main/java/com/AcquantHR/AuditManagementSystem/
 │   ├── Config/          # Security & CORS configuration
 │   ├── Controller/      # REST controllers
@@ -112,7 +115,7 @@ AuditManagementSystem/                 # Spring Boot backend
 │   └── ServiceImpl/      # Service implementations
 └── src/main/resources/application.properties
 
-AuditsManagementWebapp/                # React (Vite) frontend
+Frontend/                               # React (Vite) frontend
 ├── public/favicon.svg
 ├── src/
 │   ├── components/       # Navbar, Sidebar, Layout
@@ -131,7 +134,7 @@ AuditsManagementWebapp/                # React (Vite) frontend
 
 ### Prerequisites
 
-- Java 17+ and Maven
+- Java 21+ and Maven
 - Node.js 18+ and npm
 - MySQL 8+ (or any JPA-compatible relational database)
 
@@ -145,7 +148,7 @@ cd <your-repo>
 ### 2. Backend
 
 ```bash
-cd AuditManagementSystem
+cd backend
 
 # create the database
 mysql -u root -p -e "CREATE DATABASE audit_management;"
@@ -184,7 +187,7 @@ API is now live at **`http://localhost:8080`**.
 ### 3. Frontend
 
 ```bash
-cd AuditsManagementWebapp
+cd Frontend
 npm install
 npm run dev
 ```
@@ -248,6 +251,17 @@ In an IDE, add these under your Run Configuration's **Environment Variables** fi
 Base URL: `/api` · All protected routes require `Authorization: Bearer <token>`
 
 <details>
+<summary><strong>Analytics</strong></summary>
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| GET | `/analytics/overview` | Portfolio counts, compliance rate, finding severity breakdown, risk-ranked audits, and local recommendations | ADMIN, AUDITOR, COMPLIANCE_OFFICER |
+
+Risk analysis is deterministic and explainable: each audit is scored from inherent risk, unresolved findings, non-compliant requirements, schedule, auditor assignment, and plan completeness. Recommendations are generated from the same data; no external AI provider or API key is required.
+
+</details>
+
+<details>
 <summary><strong>Auth</strong></summary>
 
 | Method | Endpoint | Description | Access |
@@ -272,6 +286,8 @@ Base URL: `/api` · All protected routes require `Authorization: Bearer <token>`
 
 <details>
 <summary><strong>Audits</strong></summary>
+
+Audit plans include `scope`, `objectives`, and `riskLevel` alongside their title, description, status, assigned auditor, and planned dates.
 
 | Method | Endpoint | Description | Access |
 |---|---|---|---|

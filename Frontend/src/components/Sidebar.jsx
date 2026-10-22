@@ -48,6 +48,10 @@ function Sidebar() {
                     Dashboard
                 </NavLink>
 
+                <NavLink to="/analytics">
+                    AI &amp; Analytics
+                </NavLink>
+
                 {canViewUsers && (
                     <NavLink to="/users">
                         Users
